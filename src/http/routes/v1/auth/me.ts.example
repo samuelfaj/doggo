@@ -1,0 +1,27 @@
+import { Elysia, t } from 'elysia';
+import MeController from '@controllers/Me.controller';
+import ApiUtils from '@utils/Api.utils';
+import User from '@models/User';
+
+const app = new Elysia();
+const controller = new MeController();
+
+app.group('/me', (app) =>
+	app
+		.get('/', controller.get)
+		.patch('/', controller.update.bind(controller), {
+			body: t.Object({
+				firstName: t.Optional(t.String()),
+				lastName: t.Optional(t.String()),
+				email: t.Optional(t.String()),
+				passwordHash: t.Optional(t.String()),
+				enterpriseId: t.Optional(t.Number()),
+			}),
+		})
+		.put('/', controller.update.bind(controller), {
+			body: ApiUtils.modelToBodyDefinition(User),
+		})
+		.delete('/', controller.delete.bind(controller)),
+);
+
+export default app;

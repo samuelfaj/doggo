@@ -1,20 +1,44 @@
 {
-  "name": "backend",
-  "version": "1.0.50",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
-  },
-  "dependencies": {
-    "elysia": "latest",
-    "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.35.1",
-    "sequelize-typescript": "^2.1.6"
-  },
-  "devDependencies": {
-    "@types/node": "^20.10.2",
-    "@types/validator": "^13.11.7",
-    "bun-types": "latest"
-  },
-  "module": "src/index.js"
+	"name": "backend",
+	"version": "1.0.50",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "bun run --watch src/index.ts",
+		"create:migrate": "npx sequelize-cli migration:generate --name",
+		"create:seed": "npx sequelize-cli seed:generate --name",
+		"migrate": "npx sequelize-cli db:migrate --config src/configs/database.js --models-path src/models --migrations-path=database/migrations --seeders-path database/seeders",
+		"migrate:undo": "npx sequelize-cli db:migrate:undo:all --config src/configs/database.js --models-path src/models --migrations-path=database/migrations --seeders-path database/seeders",
+		"seed": "npx sequelize-cli db:seed:all --config src/configs/database.js --models-path src/models --migrations-path=database/migrations --seeders-path database/seeders",
+		"seed:undo": "npx sequelize-cli db:seed:undo:all --config src/configs/database.js --models-path src/models --migrations-path=database/migrations --seeders-path database/seeders",
+		"seed:full": "npm run seed:undo && npm run seed",
+		"migrate:full": "npm run migrate:undo && npm run migrate",
+		"migrate:seed": "npm run migrate:full && npm run seed"
+	},
+	"dependencies": {
+		"@elysiajs/cors": "^0.7.2",
+		"@elysiajs/eden": "^0.7.6",
+		"@elysiajs/swagger": "^0.7.4",
+		"elysia": "latest",
+		"eslint-plugin-tree-shaking": "latest",
+		"moment": "^2.30.1",
+		"mysql2": "^3.6.5",
+		"reflect-metadata": "^0.1.13",
+		"sequelize": "^6.35.1",
+		"sequelize-typescript": "^2.1.6"
+	},
+	"devDependencies": {
+		"@types/node": "^20.10.2",
+		"@types/validator": "^13.11.7",
+		"@typescript-eslint/eslint-plugin": "^6.18.1",
+		"bun-types": "latest",
+		"eslint": "^8.56.0",
+		"eslint-config-standard-with-typescript": "^43.0.0",
+		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-n": "^16.6.2",
+		"eslint-plugin-promise": "^6.1.1",
+		"prettier": "^3.1.1",
+		"sequelize-cli": "^6.6.2",
+		"typescript": "^5.3.3"
+	},
+	"module": "src/index.js"
 }
