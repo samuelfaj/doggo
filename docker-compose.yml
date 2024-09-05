@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  mysql:
+    image: mariadb:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: database_mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: toor
+      MYSQL_INITDB_SKIP_TZINFO: 1
+      MYSQL_MAX_ALLOWED_PACKET: 64M
+      MYSQL_INNODB_BUFFER_POOL_SIZE: 1G
+      MYSQL_INNODB_LOG_FILE_SIZE: 256M
+    ports:
+      - "3066:3306"
+    volumes:
+      - .mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  backend:
+    build: .
+    command: ['bun', 'dev']
+    environment:
+      - PORT=3090
+      - DB_USER=root
+      - DB_PASSWORD=toor
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_NAME=database_mysql
+      - DB_TZ=-07:00
+      #- AWS_S3_BUCKET=NOTUSING
+      #- AWS_ACCESSKEY=NOTUSING
+      #- AWS_SECRETKEY=NOTUSING
+    ports:
+      - "3090:3090"
+    volumes:
+      - ./:/usr/src/app
+    links:
+      - mysql
+    depends_on:
+      - mysql
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+
+volumes:
+  .mysql_data:

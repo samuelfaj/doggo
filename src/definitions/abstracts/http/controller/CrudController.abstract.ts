@@ -1,15 +1,24 @@
-import { type Context } from 'elysia';
-import { type ApiDisabledResponse, type ApiSuccessResponse } from '@definitions/types/api/apiResponses.types';
-import { type ContextParams, type RequestWithModel, RequestWithUser } from '@definitions/types/api/apiContexts.types';
-import type CrudServiceAbstract from '@abstracts/services/CrudService.abstract';
-import ApiUtils from '@utils/Api.utils';
-import NotFoundError from '@exceptions/api/NotFound.error';
-import { type FindOptions } from 'sequelize';
+import { type Context } from "elysia";
+import {
+	type ApiDisabledResponse,
+	type ApiSuccessResponse,
+} from "@definitions/types/api/apiResponses.types";
+import {
+	type ContextParams,
+	type RequestWithModel,
+	RequestWithUser,
+} from "@definitions/types/api/apiContexts.types";
+import type CrudServiceAbstract from "@abstracts/services/CrudService.abstract";
+import ApiUtils from "@utils/Api.utils";
+import NotFoundError from "@exceptions/api/NotFound.error";
+import { type FindOptions } from "sequelize";
 
 export default abstract class CrudControllerAbstract {
 	protected abstract service: CrudServiceAbstract<any>;
 
-	public async search(context: Context): Promise<ApiSuccessResponse | ApiDisabledResponse | false> {
+	public async search(
+		context: Context,
+	): Promise<ApiSuccessResponse | ApiDisabledResponse | false> {
 		const params = context.params as ContextParams;
 
 		return ApiUtils.success(
@@ -27,7 +36,7 @@ export default abstract class CrudControllerAbstract {
 		const key = Object.keys(context.params)[0];
 		const find = await this.service.findByPk(+context.params[key], options);
 
-		if (!find) throw new NotFoundError('Not found');
+		if (!find) throw new NotFoundError("Not found");
 		(context.request as RequestWithModel).model = find;
 	}
 
@@ -37,7 +46,7 @@ export default abstract class CrudControllerAbstract {
 	): Promise<ApiSuccessResponse | ApiDisabledResponse | false | void> {
 		const find = await this.service.findOne(options);
 
-		if (!find) throw new NotFoundError('Not found');
+		if (!find) throw new NotFoundError("Not found");
 		(context.request as RequestWithModel).model = find;
 	}
 
@@ -58,12 +67,17 @@ export default abstract class CrudControllerAbstract {
 	}
 
 	public async patch(
-		context: Context<{ params: Record<string, string>; body: Record<string, any> }>,
+		context: Context<{
+			params: Record<string, string>;
+			body: Record<string, any>;
+		}>,
 	): Promise<ApiSuccessResponse | ApiDisabledResponse | false> {
 		const model = (context.request as RequestWithModel).model;
 		const key = Object.keys(context.params)[0];
 
-		return ApiUtils.success(this.service.patch(model, key, context.body[key]));
+		return ApiUtils.success(
+			this.service.patch(model, key, context.body[key]),
+		);
 	}
 
 	public async update(

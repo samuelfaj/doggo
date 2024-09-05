@@ -1,4 +1,4 @@
-import { t } from 'elysia';
+import { t } from "elysia";
 
 export const patchDefinition = t.Object({
 	key: t.String(),

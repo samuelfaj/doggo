@@ -1,4 +1,4 @@
-import ServiceAbstract from '@abstracts/services/Service.abstract';
+import ServiceAbstract from "@abstracts/services/Service.abstract";
 import {
 	type FindOptions,
 	type UpdateOptions,
@@ -6,10 +6,12 @@ import {
 	type Model,
 	type Transaction,
 	type DestroyOptions,
-} from 'sequelize';
-import { type ModelCtor } from 'sequelize-typescript';
+} from "sequelize";
+import { type ModelCtor } from "sequelize-typescript";
 
-export default abstract class CrudServiceAbstract<T extends Model<any, any>> extends ServiceAbstract {
+export default abstract class CrudServiceAbstract<
+	T extends Model<any, any>,
+> extends ServiceAbstract {
 	protected abstract model: ModelCtor<any>;
 
 	async findByPk(id: number, options?: FindOptions): Promise<T | null> {
@@ -24,7 +26,10 @@ export default abstract class CrudServiceAbstract<T extends Model<any, any>> ext
 		return await this.model.findAndCountAll(query);
 	}
 
-	async create(data: T['_creationAttributes'], options?: CreateOptions): Promise<T> {
+	async create(
+		data: T["_creationAttributes"],
+		options?: CreateOptions,
+	): Promise<T> {
 		const self = this;
 
 		if (options?.transaction) {
@@ -38,14 +43,22 @@ export default abstract class CrudServiceAbstract<T extends Model<any, any>> ext
 
 	async patch(
 		model: T,
-		key: keyof T['_attributes'],
-		value: T['_attributes'][typeof key],
+		key: keyof T["_attributes"],
+		value: T["_attributes"][typeof key],
 		options?: UpdateOptions,
 	): Promise<T> {
-		return await this.update(model, { [key]: value } as Partial<T>, options);
+		return await this.update(
+			model,
+			{ [key]: value } as Partial<T>,
+			options,
+		);
 	}
 
-	async update(model: T, body: Partial<T['_attributes']>, options?: UpdateOptions): Promise<T> {
+	async update(
+		model: T,
+		body: Partial<T["_attributes"]>,
+		options?: UpdateOptions,
+	): Promise<T> {
 		if (options?.transaction) {
 			await model.update(body, options);
 

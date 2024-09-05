@@ -1,46 +1,42 @@
-import AuthenticationError from '@exceptions/api/Authentication.error';
-import PermissionError from '@exceptions/api/Permission.error';
-import { type RequestWithUser } from '@definitions/types/api/apiContexts.types';
+import AuthenticationError from "@exceptions/api/Authentication.error";
+import { type RequestWithUser } from "@definitions/types/api/apiContexts.types";
+import AuthService from "@services/Auth.service";
 
-export const userAuthMiddleware = (args?: { permission?: string }) => {
+export const userAuthMiddleware = (required = true) => {
 	return async (context: any) => {
-		const basic = context.request.headers.get('authorization');
+		const authorization =
+			context.request.headers.get("authorization") || "";
 
-		let email = null;
-		let password = null;
+		const basicAuth = async () => {
+			let username = null;
+			let password = null;
 
-		if (basic) {
-			const auth = Buffer.from(basic.split(' ')[1], 'base64').toString();
+			if (authorization) {
+				const auth = Buffer.from(
+					authorization.split(" ")[1],
+					"base64",
+				).toString();
+				[username, password] = auth.split(":");
+			}
 
-			[email, password] = auth.split(':');
+			if (username && password) {
+				(context.request as any).user =
+					await AuthService.authenticateUser(username, password);
+			}
+
+			if (required && !(context.request as RequestWithUser).user) {
+				throw new AuthenticationError("Invalid email or password");
+			}
+		};
+
+		if (!(context.request as RequestWithUser).user) {
+			if (required && !authorization) {
+				throw new AuthenticationError("Invalid email or password");
+			}
+
+			if (authorization.toLowerCase().indexOf("basic") > -1) {
+				await basicAuth();
+			}
 		}
-
-		if (!email || !password) throw new AuthenticationError('Invalid email or password');
-
-		// const request = context.request;
-		//
-		// const user = request.user
-		// 	? request.user
-		// 	: await User.findOne({
-		// 			// attributes: { exclude: ['passwordHash'] },
-		// 			include: [{ model: UserPermission }],
-		// 			where: { email, passwordHash: password },
-		// 		});
-		//
-		// if (!user) throw new AuthenticationError('Invalid email or password');
-		//
-		// if (args?.permission) {
-		// 	const hasPermission = user.UserPermissions?.find(
-		// 		(permission: UserPermission) => permission.permission === args?.permission,
-		// 	);
-		//
-		// 	if (!hasPermission) {
-		// 		throw new PermissionError(
-		// 			`Você não tem permissão para acessar este recurso. Permissão Necessária: ${args?.permission}`,
-		// 		);
-		// 	}
-		// }
-
-		(context.request as RequestWithUser).user = {}; //add your user model;
 	};
 };
